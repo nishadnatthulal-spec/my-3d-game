@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quick 36 — Cyber Neon Edition</title>
+<style>
+  :root {
+    --bg: #070b19;
+    --card: rgba(17, 25, 48, 0.88);
+    --neon-cyan: #00f0ff;
+    --neon-purple: #b829ea;
+    --neon-green: #00e676;
+    --neon-red: #ff2a5f;
+    --neon-amber: #ffbe0b;
+    --text: #f1f5f9;
+    --muted: #8b9bb4;
+    --key-bg: linear-gradient(145deg, #16203c, #0e1528);
+  }
+
+  * {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  body {
+    margin: 0;
+    padding: 12px;
+    background: radial-gradient(circle at top, #131d3b 0%, var(--bg) 70%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container { width: 100%; max-width: 460px; }
+
+  header { text-align: center; margin-bottom: 10px; }
+  header h1 {
+    margin: 0; font-size: 1.55rem; letter-spacing: 1.5px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-weight: 900;
+  }
+  header p { margin: 2px 0 0; font-size: 0.78rem; color: var(--muted); }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 6px; background: rgba(10, 15, 30, 0.9);
+    padding: 5px; border-radius: 14px; margin-bottom: 12px;
+    border: 1px solid rgba(0, 240, 255, 0.15);
+  }
+  .tab-btn {
+    flex: 1; padding: 9px; border: none; border-radius: 10px;
+    background: transparent; color: var(--muted); font-weight: 700;
+    font-size: 0.88rem; cursor: pointer; transition: 0.2s;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--neon-cyan), #0099ff);
+    color: #040814; box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+  }
+
+  .card {
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.55);
+  }
+  .hidden { display: none !important; }
+
+  /* Stats & Time Bar */
+  .stats {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; font-size: 0.85rem; font-weight: 700;
+  }
+  .badge {
+    background: #090e1f; padding: 5px 11px; border-radius: 10px;
+    border: 1px solid rgba(0, 240, 255, 0.2); color: var(--neon-cyan);
+  }
+  .time-pill {
+    position: relative;
+    color: var(--neon-green);
+    border-color: rgba(0, 230, 118, 0.3);
+  }
+  .float-delta {
+    position: absolute; right: 4px; top: -16px;
+    font-size: 0.85rem; font-weight: 900; pointer-events: none;
+    animation: popFade 0.75s ease-out forwards;
+  }
+  @keyframes popFade {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-16px) scale(1.15); }
+  }
+
+  .timebar-wrap {
+    width: 100%; height: 11px; background: #070b18;
+    border-radius: 999px; overflow: hidden; margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
+  }
+  .timebar-fill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #00e676, #00f0ff);
+    box-shadow: 0 0 12px rgba(0, 230, 118, 0.6);
+    transition: width 0.08s linear, background 0.2s ease;
+  }
+
+  /* Question & Custom Display */
+  .q-box {
+    background: linear-gradient(180deg, #0b1124, #070b17);
+    border-radius: 14px; padding: 16px 10px; text-align: center;
+    font-size: 1.95rem; font-weight: 900; letter-spacing: 1px;
+    margin-bottom: 10px; border: 1px solid rgba(0, 240, 255, 0.25);
+    box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.06);
+  }
+
+  .display-screen {
+    width: 100%; min-height: 48px; padding: 10px 14px;
+    border-radius: 12px; border: 1.5px solid rgba(184, 41, 234, 0.45);
+    background: #060a15; color: var(--neon-cyan);
+    font-size: 1.35rem; font-weight: 800; text-align: right;
+    letter-spacing: 1px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: flex-end;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.7);
+    overflow-x: auto;
+  }
+  .placeholder-txt { color: #475569; font-size: 0.95rem; font-weight: 500; }
+
+  /* Aesthetic In-Game Cyber Keypad */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: rgba(6, 10, 22, 0.75);
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 240, 255, 0.14);
+  }
+  .keypad-solver {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+  }
+  .key {
+    background: var(--key-bg);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 3px solid #050812;
+    border-radius: 12px;
+    padding: 13px 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: transform 0.06s, box-shadow 0.1s, border-color 0.15s;
+  }
+  .key:active {
+    transform: translateY(2px) scale(0.97);
+    border-bottom-width: 1px;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+  }
+  .key-op {
+    color: var(--neon-cyan);
+    background: linear-gradient(145deg, #132544, #0b162c);
+    font-size: 1.1rem;
+  }
+  .key-del {
+    color: var(--neon-red);
+    background: linear-gradient(145deg, #2e1222, #1b0a14);
+    border-color: rgba(255, 42, 95, 0.25);
+  }
+  .key-ok {
+    background: linear-gradient(135deg, var(--neon-green), #00b259);
+    color: #031f10;
+    border-bottom: 3px solid #006633;
+    box-shadow: 0 0 14px rgba(0, 230, 118, 0.3);
+  }
+  .key-wide { grid-column: span 2; }
+
+  .btn {
+    width: 100%; padding: 13px; border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.15s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+  }
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.07); color: var(--neon-cyan);
+    border: 1px solid rgba(0, 240, 255, 0.25); margin-top: 9px;
+    font-size: 0.88rem; padding: 10px;
+  }
+
+  /* Tutorial Box */
+  .tutorial-box {
+    margin-top: 12px; background: #070c1b;
+    border-left: 4px solid var(--neon-green);
+    border-radius: 12px; padding: 12px; font-size: 0.88rem; line-height: 1.5;
+  }
+  .tutorial-box h3 { margin: 0 0 6px; color: var(--neon-green); font-size: 0.96rem; }
+  .step { margin-bottom: 5px; padding-left: 8px; border-left: 2px solid #1e293b; color: #cbd5e1; }
+  .ans-highlight {
+    font-size: 1.2rem; font-weight: 900; color: var(--neon-cyan);
+    background: rgba(0, 240, 255, 0.1); padding: 6px 10px;
+    border-radius: 8px; margin-bottom: 8px; display: inline-block;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .chip {
+    background: #131d38; color: var(--neon-cyan);
+    border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 8px;
+    padding: 5px 9px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>⚡ QUICK 36</h1>
+    <p>10s Survival Bar • +3s Hit / -3s Miss • Cyber Keypad</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabGame" onclick="switchTab('game')">🎮 Quick 36</button>
+    <button class="tab-btn" id="tabSolver" onclick="switchTab('solver')">🧠 Q + Tutorial</button>
+  </div>
+
+  <!-- TAB 1: QUICK 36 GAME -->
+  <div id="gameSection" class="card">
+    <div id="startScreen" style="text-align:center; padding: 10px 0;">
+      <p style="color:var(--muted); font-size:0.9rem; line-height:1.5; margin-bottom:16px;">
+        • Total Time Bar: <b>10 Seconds</b><br>
+        • Sahi Jawab: <span style="color:var(--neon-green); font-weight:700;">+3s</span> (Max 10s)<br>
+        • Galat Jawab: <span style="color:var(--neon-red); font-weight:700;">-3s</span> + Instant Tutorial
+      </p>
+      <button class="btn btn-primary" onclick="startGame()">🚀 START QUICK 36</button>
+    </div>
+
+    <div id="playScreen" class="hidden">
+      <div class="stats">
+        <div class="badge">Q: <span id="qCount">1</span>/36</div>
+        <div class="badge">Score: <span id="score">0</span></div>
+        <div class="badge time-pill" id="timePill">⏱ <span id="timeText">10.0</span>s</div>
+      </div>
+
+      <!-- 10s Countdown Bar -->
+      <div class="timebar-wrap">
+        <div id="timeBar" class="timebar-fill"></div>
+      </div>
+
+      <div class="q-box" id="gameQuestion">12 + 8</div>
+
+      <!-- Custom Display (No System Keyboard) -->
+      <div class="display-screen" id="gameDisplay">
+        <span class="placeholder-txt">Keypad se answer dabao...</span>
+      </div>
+
+      <!-- In-Game Aesthetic Numeric Keypad -->
+      <div class="keypad" id="gameKeypad">
+        <button class="key" onclick="gameKeyPress('1')">1</button>
+        <button class="key" onclick="gameKeyPress('2')">2</button>
+        <button class="key" onclick="gameKeyPress('3')">3</button>
+        <button class="key" onclick="gameKeyPress('4')">4</button>
+        <button class="key" onclick="gameKeyPress('5')">5</button>
+        <button class="key" onclick="gameKeyPress('6')">6</button>
+        <button class="key" onclick="gameKeyPress('7')">7</button>
+        <button class="key" onclick="gameKeyPress('8')">8</button>
+        <button class="key" onclick="gameKeyPress('9')">9</button>
+        <button class="key key-del" onclick="gameBackspace()">⌫</button>
+        <button class="key" onclick="gameKeyPress('0')">0</button>
+        <button class="key key-ok" onclick="submitGameAnswer()">OK ✓</button>
+      </div>
+
+      <button class="btn btn-secondary" onclick="peekTutorial()">💡 Tutorial Dekho (Timer Pause)</button>
+
+      <div id="gameFeedback" class="tutorial-box hidden"></div>
+    </div>
+
+    <div id="endScreen" class="hidden" style="text-align:center; padding: 10px 0;">
+      <h2 id="endTitle" style="color:var(--neon-cyan); margin-top:0;">⏱ Time Up!</h2>
+      <p id="finalSummary" style="font-size:1rem; line-height:1.5;"></p>
+      <button class="btn btn-primary" onclick="startGame()">🔄 Dobara Khelo</button>
+    </div>
+  </div>
+
+  <!-- TAB 2: CUSTOM QUESTION SOLVER + TUTORIAL -->
+  <div id="solverSection" class="card hidden">
+    <div class="chips">
+      <button class="chip" onclick="fillExample('24*15')">24×15</button>
+      <button class="chip" onclick="fillExample('(48+12)/5')">(48+12)/5</button>
+      <button class="chip" onclick="fillExample('20% of 450')">20% of 450</button>
+      <button class="chip" onclick="fillExample('3x+7=22')">3x+7=22</button>
+      <button class="chip" onclick="fillExample('18^2')">18^2</button>
+    </div>
+
+    <div class="display-screen" id="solverDisplay">
+      <span class="placeholder-txt">Neeche keypad se Q type karo...</span>
+    </div>
+
+    <!-- Custom Aesthetic Math Keypad -->
+    <div class="keypad keypad-solver">
+      <button class="key key-del" onclick="solverClear()">AC</button>
+      <button class="key key-op" onclick="solverKeyPress('(')">(</button>
+      <button class="key key-op" onclick="solverKeyPress(')')">)</button>
+      <button class="key key-del" onclick="solverBackspace()">⌫</button>
+
+      <button class="key" onclick="solverKeyPress('7')">7</button>
+      <button class="key" onclick="solverKeyPress('8')">8</button>
+      <button class="key" onclick="solverKeyPress('9')">9</button>
+      <button class="key key-op" onclick="solverKeyPress('/')">÷</button>
+
+      <button class="key" onclick="solverKeyPress('4')">4</button>
+      <button class="key" onclick="solverKeyPress('5')">5</button>
+      <button class="key" onclick="solverKeyPress('6')">6</button>
+      <button class="key key-op" onclick="solverKeyPress('*')">×</button>
+
+      <button class="key" onclick="solverKeyPress('1')">1</button>
+      <button class="key" onclick="solverKeyPress('2')">2</button>
+      <button class="key" onclick="solverKeyPress('3')">3</button>
+      <button class="key key-op" onclick="solverKeyPress('-')">−</button>
+
+      <button class="key" onclick="solverKeyPress('0')">0</button>
+      <button class="key key-op" onclick="solverKeyPress('x')">x</button>
+      <button class="key key-op" onclick="solverKeyPress('=')">=</button>
+      <button class="key key-op" onclick="solverKeyPress('+')">+</button>
+
+      <button class="key key-op" onclick="solverKeyPress('% of ')">% of</button>
+      <button class="key key-op" onclick="solverKeyPress('^2')">^2</button>
+      <button class="key key-ok key-wide" onclick="solveCustomQuestion()">✨ SOLVE + TUTORIAL</button>
+    </div>
+
+    <div id="customOutput" class="tutorial-box hidden"></div>
+  </div>
+</div>
+
+<script>
+// Sound Engine
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playBeep(freq, type = 'sine', duration = 0.08) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.11, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function switchTab(tab) {
+  if (tab !== 'game') pauseTimer();
+  document.getElementById('tabGame').classList.toggle('active', tab === 'game');
+  document.getElementById('tabSolver').classList.toggle('active', tab === 'solver');
+  document.getElementById('gameSection').classList.toggle('hidden', tab !== 'game');
+  document.getElementById('solverSection').classList.toggle('hidden', tab !== 'solver');
+}
+
+// --- GAME VARIABLES ---
+const MAX_TIME = 10.0;
+let timeLeft = MAX_TIME;
+let timerInterval = null;
+let isPaused = false;
+let qIndex = 1;
+let score = 0;
+let gameInput = '';
+let currentQObj = null;
+
+function updateGameDisplay() {
+  const disp = document.getElementById('gameDisplay');
+  disp.innerHTML = gameInput === ''
+    ? '<span class="placeholder-txt">Keypad se answer dabao...</span>'
+    : gameInput;
+}
+
+function gameKeyPress(digit) {
+  if (isPaused || gameInput.length >= 6) return;
+  playBeep(460, 'sine', 0.04);
+  gameInput += digit;
+  updateGameDisplay();
+}
+
+function gameBackspace() {
+  if (isPaused || gameInput.length === 0) return;
+  playBeep(300, 'sine', 0.04);
+  gameInput = gameInput.slice(0, -1);
+  updateGameDisplay();
+}
+
+function showDeltaBadge(text, color) {
+  const pill = document.getElementById('timePill');
+  const el = document.createElement('span');
+  el.className = 'float-delta';
+  el.style.color = color;
+  el.innerText = text;
+  pill.appendChild(el);
+  setTimeout(() => el.remove(), 750);
+}
+
+function updateTimeBarUI() {
+  const pct = Math.max(0, Math.min(100, (timeLeft / MAX_TIME) * 100));
+  const bar = document.getElementById('timeBar');
+  document.getElementById('timeText').innerText = Math.max(0, timeLeft).toFixed(1);
+  bar.style.width = pct + '%';
+
+  if (pct <= 30) {
+    bar.style.background = 'linear-gradient(90deg, #ff2a5f, #ff6b6b)';
+    bar.style.boxShadow = '0 0 12px rgba(255, 42, 95, 0.7)';
+  } else if (pct <= 60) {
+    bar.style.background = 'linear-gradient(90deg, #ffbe0b, #fb5607)';
+    bar.style.boxShadow = '0 0 12px rgba(255, 190, 11, 0.6)';
+  } else {
+    bar.style.background = 'linear-gradient(90deg, #00e676, #00f0ff)';
+    bar.style.boxShadow = '0 0 12px rgba(0, 230, 118, 0.6)';
+  }
+}
+
+function startMasterTimer() {
+  clearInterval(timerInterval);
+  isPaused = false;
+  timerInterval = setInterval(() => {
+    if (isPaused) return;
+    timeLeft -= 0.1;
+    updateTimeBarUI();
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      updateTimeBarUI();
+      endGame(false);
+    }
+  }, 100);
+}
+
+function pauseTimer() { isPaused = true; }
+function resumeTimer() { isPaused = false; }
+
+function generateQuestion() {
+  const ops = ['+', '-', '*'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a, b, ans, steps;
+
+  if (op === '+') {
+    a = Math.floor(Math.random() * 40) + 11;
+    b = Math.floor(Math.random() * 40) + 11;
+    ans = a + b;
+    steps = [
+      `Tens ko jodo: ${Math.floor(a/10)*10} + ${Math.floor(b/10)*10} = ${(Math.floor(a/10)+Math.floor(b/10))*10}`,
+      `Units ko jodo: ${a%10} + ${b%10} = ${(a%10)+(b%10)}`,
+      `Total = <b>${ans}</b>`
+    ];
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 55) + 30;
+    b = Math.floor(Math.random() * 25) + 6;
+    ans = a - b;
+    steps = [
+      `${a} mein se pehle ${Math.floor(b/10)*10} ghatao = ${a - Math.floor(b/10)*10}`,
+      `Ab bacha ${b%10} ghatao = <b>${ans}</b>`
+    ];
+  } else {
+    a = Math.floor(Math.random() * 12) + 6;
+    b = Math.floor(Math.random() * 8) + 3;
+    ans = a * b;
+    steps = [
+      `${a} ko todo: (${a - (a%10)} + ${a%10}) × ${b}`,
+      `${(a - (a%10))*b} + ${(a%10)*b} = <b>${ans}</b>`
+    ];
+  }
+  return { text: `${a} ${op === '*' ? '×' : op} ${b}`, ans, steps };
+}
+
+function startGame() {
+  qIndex = 1; score = 0; timeLeft = MAX_TIME;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('endScreen').classList.add('hidden');
+  document.getElementById('playScreen').classList.remove('hidden');
+  updateTimeBarUI();
+  loadNextQuestion();
+  startMasterTimer();
+}
+
+function loadNextQuestion() {
+  gameInput = '';
+  updateGameDisplay();
+  document.getElementById('qCount').innerText = qIndex;
+  document.getElementById('score').innerText = score;
+  document.getElementById('gameFeedback').classList.add('hidden');
+  currentQObj = generateQuestion();
+  document.getElementById('gameQuestion').innerText = currentQObj.text;
+  resumeTimer();
+}
+
+function submitGameAnswer() {
+  if (isPaused || gameInput === '') return;
+  const userVal = parseInt(gameInput, 10);
+
+  if (userVal === currentQObj.ans) {
+    // +3s bonus capped at 10s
+    timeLeft = Math.min(MAX_TIME, timeLeft + 3);
+    updateTimeBarUI();
+    showDeltaBadge('+3s', '#00e676');
+    playBeep(680, 'triangle', 0.1);
+
+    score++;
+    if (qIndex >= 36) {
+      endGame(true);
+    } else {
+      qIndex++;
+      loadNextQuestion();
+    }
+  } else {
+    // -3s penalty
+    timeLeft = Math.max(0, timeLeft - 3);
+    updateTimeBarUI();
+    showDeltaBadge('-3s', '#ff2a5f');
+    playBeep(170, 'sawtooth', 0.2);
+
+    if (timeLeft <= 0) {
+      endGame(false);
+    } else {
+      pauseTimer();
+      showGameTutorial('❌ Galat (-3s Penalty)! Trick Dekho:');
+    }
+  }
+}
+
+function peekTutorial() {
+  if (isPaused) return;
+  pauseTimer();
+  showGameTutorial('💡 Quick Trick Tutorial:');
+}
+
+function showGameTutorial(heading) {
+  const fb = document.getElementById('gameFeedback');
+  fb.classList.remove('hidden');
+  fb.innerHTML = `
+    <h3>${heading}</h3>
+    <div class="ans-highlight">Sahi Answer: ${currentQObj.ans}</div>
+    ${currentQObj.steps.map((s, i) => `<div class="step"><b>Step ${i+1}:</b> ${s}</div>`).join('')}
+    <button class="btn btn-primary" style="margin-top:8px; padding:10px;" onclick="nextAfterTutorial()">Agla Sawal →</button>
+  `;
+}
+
+function nextAfterTutorial() {
+  if (qIndex >= 36) {
+    endGame(true);
+  } else {
+    qIndex++;
+    loadNextQuestion();
+  }
+}
+
+function endGame(completedAll) {
+  clearInterval(timerInterval);
+  document.getElementById('playScreen').classList.add('hidden');
+  document.getElementById('endScreen').classList.remove('hidden');
+  document.getElementById('endTitle').innerText = completedAll ? '🏆 Quick 36 Cleared!' : '⏱ Time Over!';
+  document.getElementById('finalSummary').innerHTML =
+    `Tumhara Final Score: <b>${score} / 36</b><br>Bacha hua Time: <b>${timeLeft.toFixed(1)}s</b>`;
+}
+
+// --- CUSTOM SOLVER KEYPAD & LOGIC ---
+let solverInput = '';
+
+function updateSolverDisplay() {
+  const disp = document.getElementById('solverDisplay');
+  disp.innerHTML = solverInput === ''
+    ? '<span class="placeholder-txt">Neeche k
